@@ -1,1 +1,20 @@
+# Get OS Details
+Step # 01 : 
+Use JavaScript => File URLs => #APP_FILES#os_info.js
 
+Step # 02 : Create Page Items where get and store
+=> eg :
+P18_OS_NAME
+P18_BROWSER_NAME
+P18_BROWSER_VERSION
+
+Step # 03 : Use below code on Execute when Page Loads / Create a Dynamic Action on Page Load
+=> Code :
+
+let os = platform.os;
+let browser = platform.name;
+let browserVersion = platform.version;
+
+apex.item("P18_OS_NAME").setValue(os);
+apex.item("P18_BROWSER_NAME").setValue(browser);
+apex.item("P18_BROWSER_VERSION").setValue(browserVersion);
