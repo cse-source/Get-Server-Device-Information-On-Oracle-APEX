@@ -1,12 +1,10 @@
-# Get OS Details
+################## Get OS Details
+
 Step # 01 : 
 Use JavaScript => File URLs => #APP_FILES#os_info.js
 
 Step # 02 : Create Page Items where get and store
-=> eg :
-P18_OS_NAME
-P18_BROWSER_NAME
-P18_BROWSER_VERSION
+=> eg : P18_OS_NAME, P18_BROWSER_NAME, P18_BROWSER_VERSION
 
 Step # 03 : Use below code on Execute when Page Loads / Create a Dynamic Action on Page Load
 => Code :
@@ -18,3 +16,211 @@ let browserVersion = platform.version;
 apex.item("P18_OS_NAME").setValue(os);
 apex.item("P18_BROWSER_NAME").setValue(browser);
 apex.item("P18_BROWSER_VERSION").setValue(browserVersion);
+
+################## Get HTTP User Agent
+
+Step # 01 : Create Page Items where get and store
+=> eg : P18_USER_AGENT
+
+Step # 02 : Use below code on Execute when Page Loads / Create a Dynamic Action on Page Load
+=> Code :
+
+function getuserAgent() {
+  return [
+    navigator.userAgent,
+    navigator.language,
+    screen.width + "x" + screen.height,
+    screen.colorDepth,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    navigator.platform
+  ].join("||");
+}
+
+var userAgent = getuserAgent();
+apex.item("P18_USER_AGENT").setValue(userAgent);
+
+################## Get SYS Guid / Device ID
+
+Step # 01 : Create Page Items where get and store
+=> eg : P18_DEVICE_ID
+
+Step # 02 : Use below code on Execute when Page Loads / Create a Dynamic Action on Page Load
+=> Code :
+
+function getDeviceId() {
+  let id = localStorage.getItem("DEVICE_ID");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("DEVICE_ID", id);
+  }
+  return id;
+}
+
+apex.item("P18_DEVICE_ID").setValue(getDeviceId());
+
+################## Get User Agent, Screen Size & Timezone
+
+Step # 01 : Create Page Items where get and store
+=> eg : P18_USER_AGENT, P18_SCREEN, P18_TIMEZONE
+
+Step # 02 : Use below code on Execute when Page Loads / Create a Dynamic Action on Page Load
+=> Code :
+
+let ua = navigator.userAgent;
+
+apex.item("P18_USER_AGENT").setValue(ua);
+apex.item("P18_SCREEN").setValue(screen.width + "x" + screen.height);
+apex.item("P18_TIMEZONE").setValue(Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+################## Get Location (User Permission Required) Latitude & Longitude
+
+Step # 01 : Create Page Items where get and store
+=> eg : P18_LATITUDE, P18_LONGITUDE
+
+Step # 02 : Use below code on Execute when Page Loads / Create a Dynamic Action on Page Load
+=> Code :
+
+navigator.geolocation.getCurrentPosition(function(pos){
+    apex.item("P18_LATITUDE").setValue(pos.coords.latitude);
+    apex.item("P18_LONGITUDE").setValue(pos.coords.longitude);
+});
+
+################## JavaScript Library For Get All Client Informations at a Time
+
+Step # 01 : Create Page Items where get and store
+=> eg : P18_DEVICE_TYPE, P18_OS_NAME, P18_OS_VERSION, P18_BROWSER, P18_BROWSER_VERSION, P18_SCREEN, P18_TIMEZONE, P18_LANGUAGE, P18_DEVICE_HASH, P18_LAT, P18_LON
+
+Step # 02 : Use JavaScript => Function and Global Variable Declaration
+
+(function (window) {
+    "use strict";
+
+    function ua() { return navigator.userAgent || ""; }
+
+    function deviceType() {
+        var u = ua().toLowerCase();
+        if (u.indexOf("ipad") > -1 || u.indexOf("tablet") > -1) return "TABLET";
+        if (u.indexOf("mobi") > -1 || u.indexOf("android") > -1) return "MOBILE";
+        return "DESKTOP";
+    }
+
+    function osName() {
+        var u = ua();
+        if (u.indexOf("Windows NT") > -1) return "Windows";
+        if (u.indexOf("Android") > -1) return "Android";
+        if (/iPhone|iPad/.test(u)) return "iOS";
+        if (u.indexOf("Mac OS X") > -1) return "MacOS";
+        if (u.indexOf("Linux") > -1) return "Linux";
+        return "Unknown";
+    }
+
+    function osVersion() {
+        var u = ua(), m;
+        if ((m = u.match(/Windows NT ([0-9.]+)/))) return m[1];
+        if ((m = u.match(/Android ([0-9.]+)/))) return m[1];
+        if ((m = u.match(/OS ([0-9_]+)/))) return m[1].replace(/_/g, ".");
+        if ((m = u.match(/Mac OS X ([0-9_]+)/))) return m[1].replace(/_/g, ".");
+        return "Unknown";
+    }
+
+    function browserName() {
+        var u = ua();
+        if (u.indexOf("Edg") > -1) return "Edge";
+        if (u.indexOf("Chrome") > -1) return "Chrome";
+        if (u.indexOf("Firefox") > -1) return "Firefox";
+        if (u.indexOf("Safari") > -1) return "Safari";
+        return "Unknown";
+    }
+
+    function browserVersion() {
+        var u = ua(), m;
+        if ((m = u.match(/Edg\/([0-9.]+)/))) return m[1];
+        if ((m = u.match(/Chrome\/([0-9.]+)/))) return m[1];
+        if ((m = u.match(/Firefox\/([0-9.]+)/))) return m[1];
+        if ((m = u.match(/Version\/([0-9.]+)/))) return m[1];
+        return "Unknown";
+    }
+
+    function screenInfo() {
+        var w = window.innerWidth ||
+                document.documentElement.clientWidth ||
+                document.body.clientWidth;
+
+        var h = window.innerHeight ||
+                document.documentElement.clientHeight ||
+                document.body.clientHeight;
+
+        return (w && h) ? (w + "x" + h) : "Unknown";
+    }
+
+    function timezone() {
+        try {
+            return Intl.DateTimeFormat().resolvedOptions().timeZone;
+        } catch (e) {
+            return "Unknown";
+        }
+    }
+
+    function language() {
+        return navigator.language || "Unknown";
+    }
+
+    function simpleHash(str) {
+        var hash = 0, i;
+        for (i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash |= 0;
+        }
+        return "D" + Math.abs(hash);
+    }
+
+    function fingerprint() {
+        return simpleHash(
+            ua() + screenInfo() + timezone() + language()
+        );
+    }
+
+    function captureLocation(cb) {
+        if (!navigator.geolocation) {
+            cb(null, null);
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            function (p) { cb(p.coords.latitude, p.coords.longitude); },
+            function () { cb(null, null); },
+            { timeout: 5000 }
+        );
+    }
+
+    window.ApexDevice = {
+        deviceType: deviceType,
+        osName: osName,
+        osVersion: osVersion,
+        browserName: browserName,
+        browserVersion: browserVersion,
+        screenInfo: screenInfo,
+        timezone: timezone,
+        language: language,
+        fingerprint: fingerprint,
+        captureLocation: captureLocation
+    };
+
+})(window);
+
+Step # 03 : Use below code on Execute when Page Loads / Create a Dynamic Action on Page Load
+=> Code :
+
+apex.item("P18_DEVICE_TYPE").setValue(ApexDevice.deviceType());
+apex.item("P18_OS_NAME").setValue(ApexDevice.osName());
+apex.item("P18_OS_VERSION").setValue(ApexDevice.osVersion());
+apex.item("P18_BROWSER").setValue(ApexDevice.browserName());
+apex.item("P18_BROWSER_VERSION").setValue(ApexDevice.browserVersion());
+apex.item("P18_SCREEN").setValue(ApexDevice.screenInfo());
+apex.item("P18_TIMEZONE").setValue(ApexDevice.timezone());
+apex.item("P18_LANGUAGE").setValue(ApexDevice.language());
+apex.item("P18_DEVICE_HASH").setValue(ApexDevice.fingerprint());
+ApexDevice.captureLocation(function (lat, lon) {
+    apex.item("P18_LAT").setValue(lat);
+    apex.item("P18_LON").setValue(lon);
+});
+
