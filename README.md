@@ -26,3 +26,4 @@ The goal of this repository is to help Oracle APEX developers easily integrate d
 This repository is intended for APEX developers who want a lightweight way to capture client-side environment details directly within their applications.
 
 ## 📁 Deployment Outlook
+<img width="100%" height="350px" alt="image" src="https://github.com/cse-source/Get-Server-Device-Information-On-Oracle-APEX/blob/main/Server%20%26%20Device%20Informations.jpeg" />
