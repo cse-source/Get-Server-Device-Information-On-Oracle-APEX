@@ -24,3 +24,6 @@ The goal of this repository is to help Oracle APEX developers easily integrate d
 * Browser APIs (Navigator, Screen)
 
 This repository is intended for APEX developers who want a lightweight way to capture client-side environment details directly within their applications.
+
+## 📁 Deployment Outlook
+
